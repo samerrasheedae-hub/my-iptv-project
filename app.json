@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Premium IPTV",
+    "slug": "premium-iptv-ui",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "premiumiptv",
+    "userInterfaceStyle": "dark",
+    "icon": "./assets/icon.png",
+    "assetBundlePatterns": ["assets/*"],
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#050509"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.premiumiptv.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIRequiresFullScreen": true
+      }
+    },
+    "android": {
+      "package": "com.premiumiptv.app",
+      "versionCode": 1,
+      "resizeableActivity": false,
+      "permissions": [],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#050509"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
+  }
+}
