@@ -28,20 +28,17 @@ export default function HeroSection({ item, onWatchNow, onDetails, onMyList, onD
 
   return (
     <View style={styles.container}>
-      <Image 
-        source={{ uri: heroImage }} 
-        style={styles.backgroundImage}
-        resizeMode="cover"
-      />
-      
-      <View style={styles.overlay} />
+      <Image source={{ uri: heroImage }} style={styles.backgroundImage} resizeMode="cover" />
+
+      {/* Only bottom gradient — top is clear */}
+      <View style={styles.bottomGradient} />
 
       <View style={styles.content}>
         <View style={styles.badge}>
           <Text style={styles.badgeText}>Recommended for You</Text>
         </View>
 
-        <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
+        <Text style={styles.title}>{item.title}</Text>
 
         {(item.genre || item.year) && (
           <Text style={styles.subtitle}>{item.genre} • {item.year}</Text>
@@ -51,41 +48,31 @@ export default function HeroSection({ item, onWatchNow, onDetails, onMyList, onD
           <Text style={styles.description} numberOfLines={2}>{item.description}</Text>
         )}
 
-        {/* Main Buttons */}
         <View style={styles.buttonRow}>
-          <TouchableOpacity 
-            style={styles.watchNowButton} 
-            onPress={onWatchNow}
-            activeOpacity={0.85}
-          >
+          <TouchableOpacity style={styles.watchNowButton} onPress={onWatchNow} activeOpacity={0.85}>
             <Ionicons name="play" size={18} color="#000" />
             <Text style={styles.watchNowText}>Watch Now</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.detailsButton} 
-            onPress={onDetails}
-            activeOpacity={0.85}
-          >
+          <TouchableOpacity style={styles.detailsButton} onPress={onDetails} activeOpacity={0.85}>
             <Ionicons name="information-circle-outline" size={18} color={colors.text} />
             <Text style={styles.detailsText}>Details</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Quick Actions - Smaller & more premium */}
         <View style={styles.quickActionsPill}>
           <TouchableOpacity style={styles.quickBtn} onPress={onMyList}>
-            <Ionicons name="heart-outline" size={13} color={colors.text} />
+            <Ionicons name="heart-outline" size={18} color={colors.text} />
             <Text style={styles.quickText}>My List</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.quickBtn} onPress={onDownload}>
-            <Ionicons name="download-outline" size={13} color={colors.text} />
+            <Ionicons name="download-outline" size={18} color={colors.text} />
             <Text style={styles.quickText}>Download</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.quickBtn} onPress={onShare}>
-            <Ionicons name="share-outline" size={13} color={colors.text} />
+            <Ionicons name="share-outline" size={18} color={colors.text} />
             <Text style={styles.quickText}>Share</Text>
           </TouchableOpacity>
         </View>
@@ -106,13 +93,13 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  overlay: {
+  bottomGradient: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    height: '82%',
-    backgroundColor: 'rgba(0,0,0,0.72)',
+    height: '45%',
+    backgroundColor: 'rgba(5,5,9,0.8)',
   },
   content: {
     position: 'absolute',
@@ -188,7 +175,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  // Compact premium pill
   quickActionsPill: {
     flexDirection: 'row',
     justifyContent: 'space-around',

@@ -18,6 +18,15 @@ export default function HomeScreen() {
   const { toggleMyList } = useStreamingActions();
 
   const stripRef = useRef<ScrollView>(null);
+  const startSpinRef = useRef<(() => void) | null>(null);
+
+  // Must be before any early return
+  useEffect(() => {
+    if (showSurprise && surprisePool.length > 0) {
+      const timer = setTimeout(() => startSpinRef.current?.(), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [showSurprise, surprisePool]);
 
   if (isLoading || !data) {
     return (
@@ -61,7 +70,6 @@ export default function HomeScreen() {
     Alert.alert('Share', `Sharing "${item.title}"`);
   };
 
-  // === SURPRISE ME - spinning reel ===
   const openSurpriseMe = () => {
     if (selectedCategory === 'Live TV') {
       Alert.alert('Surprise Me', 'Surprise Me is available only for Movies and TV Series.');
@@ -90,52 +98,52 @@ export default function HomeScreen() {
     setIsSpinning(true);
     setPickedItem(null);
 
-    let xPos = 18;
-    const speed = 124;
+    let xPos = 0;
+    const totalDuration = 2800;
+    const startTime = Date.now();
 
     const spinInterval = setInterval(() => {
-      xPos += speed;
+      const elapsed = Date.now() - startTime;
+      const progress = elapsed / totalDuration;
+      const easedSpeed = 18 + (1 - progress) * 14;
+
+      xPos += easedSpeed;
+
       if (stripRef.current) {
         stripRef.current.scrollTo({ x: xPos, animated: false });
       }
-      if (xPos > 2350) xPos = 25;
-    }, 32);
 
-    setTimeout(() => {
-      clearInterval(spinInterval);
+      if (elapsed >= totalDuration) {
+        clearInterval(spinInterval);
 
-      const randomIndex = Math.floor(Math.random() * surprisePool.length);
-      const final = surprisePool[randomIndex];
+        const randomIndex = Math.floor(Math.random() * surprisePool.length);
+        const final = surprisePool[randomIndex];
 
-      setPickedItem(final);
-      setIsSpinning(false);
+        setPickedItem(final);
+        setIsSpinning(false);
 
-      const cardWidth = 84;
-      const targetX = Math.max(8, (randomIndex * cardWidth) - 22);
+        const cardWidth = 84;
+        const targetX = Math.max(8, (randomIndex * cardWidth) - 22);
 
-      setTimeout(() => {
-        if (stripRef.current) {
-          stripRef.current.scrollTo({ x: targetX, animated: true });
-        }
-      }, 120);
-    }, 3950);
+        setTimeout(() => {
+          if (stripRef.current) {
+            stripRef.current.scrollTo({ x: targetX, animated: true });
+          }
+        }, 100);
+      }
+    }, 16);
   };
 
-  useEffect(() => {
-    if (showSurprise && surprisePool.length > 0) {
-      const timer = setTimeout(() => startSpin(), 420);
-      return () => clearTimeout(timer);
-    }
-  }, [showSurprise, surprisePool]);
+  startSpinRef.current = startSpin;
 
   const handleSpinAgain = () => {
     if (surprisePool.length === 0) return;
     setPickedItem(null);
     setIsSpinning(true);
     setTimeout(() => {
-      if (stripRef.current) stripRef.current.scrollTo({ x: 20, animated: false });
+      if (stripRef.current) stripRef.current.scrollTo({ x: 0, animated: false });
       startSpin();
-    }, 70);
+    }, 50);
   };
 
   const handleWatchPicked = () => {
@@ -181,12 +189,8 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      {/* ONLY DROPDOWN ON THE RIGHT - NO TITLE */}
       <View style={styles.topBar}>
-        <CategoryDropdown 
-          selected={selectedCategory} 
-          onSelect={setSelectedCategory} 
-        />
+        <CategoryDropdown selected={selectedCategory} onSelect={setSelectedCategory} />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -199,7 +203,6 @@ export default function HomeScreen() {
           onShare={() => handleShare(heroItem)}
         />
 
-        {/* Continue Watching */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Continue Watching</Text>
@@ -212,7 +215,6 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* Mood + Matching */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>What's your mood?</Text>
 
@@ -227,8 +229,8 @@ export default function HomeScreen() {
                   { emoji: '🔥', label: 'Excited' },
                   { emoji: '😴', label: 'Tired' },
                 ].map((mood, index) => (
-                  <TouchableOpacity 
-                    key={index} 
+                  <TouchableOpacity
+                    key={index}
                     style={[styles.moodChip, activeMood === mood.label && styles.moodChipActive]}
                     onPress={() => handleMood(mood.label)}
                     activeOpacity={0.8}
@@ -263,12 +265,7 @@ export default function HomeScreen() {
           )}
         </View>
 
-        {/* Surprise Me Banner */}
-        <TouchableOpacity 
-          style={styles.surpriseBanner} 
-          activeOpacity={0.9}
-          onPress={openSurpriseMe}
-        >
+        <TouchableOpacity style={styles.surpriseBanner} activeOpacity={0.9} onPress={openSurpriseMe}>
           <View>
             <Text style={styles.surpriseTitle}>🎲 Surprise Me!</Text>
             <Text style={styles.surpriseSubtitle}>Let us pick for you</Text>
@@ -276,7 +273,6 @@ export default function HomeScreen() {
           <Text style={styles.surpriseIcon}>🎞️</Text>
         </TouchableOpacity>
 
-        {/* For You */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>For You</Text>
@@ -292,7 +288,6 @@ export default function HomeScreen() {
         <View style={{ height: 110 }} />
       </ScrollView>
 
-      {/* Spinning Reel Modal */}
       <Modal visible={showSurprise} transparent animationType="fade" onRequestClose={closeSurprise}>
         <View style={styles.modalOverlay}>
           <View style={styles.surpriseModal}>
@@ -374,8 +369,6 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-
-  // MINIMAL TOP BAR - ONLY DROPDOWN ON RIGHT (no title at all)
   topBar: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -386,16 +379,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     zIndex: 10,
   },
-
   scrollContent: { paddingBottom: 20 },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },
   loadingText: { color: colors.text, fontSize: 16 },
-
   section: { marginBottom: 24, paddingHorizontal: 20 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   sectionTitle: { color: colors.text, fontSize: 18, fontWeight: '700' },
   seeAll: { color: colors.textSecondary, fontSize: 14, fontWeight: '500' },
-
   contentCard: {
     width: 118, height: 158, backgroundColor: colors.surface,
     borderRadius: 10, marginRight: 10, overflow: 'hidden',
@@ -404,7 +394,6 @@ const styles = StyleSheet.create({
   cardInfo: { paddingHorizontal: 8, paddingVertical: 7, backgroundColor: 'rgba(0,0,0,0.65)' },
   cardTitle: { color: colors.text, fontSize: 12, fontWeight: '600' },
   cardMeta: { color: colors.textSecondary, fontSize: 10, marginTop: 1 },
-
   moodScroll: { marginTop: 8 },
   moodChip: {
     backgroundColor: colors.moodBg, paddingHorizontal: 18, paddingVertical: 10,
@@ -416,7 +405,6 @@ const styles = StyleSheet.create({
   clearMood: { alignSelf: 'flex-end', marginTop: 2, marginBottom: 6 },
   clearMoodText: { color: colors.textSecondary, fontSize: 12, fontWeight: '500' },
   moodNote: { color: colors.textSecondary, fontSize: 13, fontStyle: 'italic', paddingVertical: 8 },
-
   surpriseBanner: {
     marginHorizontal: 20, backgroundColor: colors.accent, borderRadius: 16,
     padding: 18, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24,
@@ -424,14 +412,12 @@ const styles = StyleSheet.create({
   surpriseTitle: { color: '#000000', fontSize: 18, fontWeight: '700' },
   surpriseSubtitle: { color: 'rgba(0,0,0,0.75)', fontSize: 13, marginTop: 2 },
   surpriseIcon: { fontSize: 30 },
-
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.82)', justifyContent: 'center', alignItems: 'center', padding: 16 },
   surpriseModal: { backgroundColor: '#1C1C1C', borderRadius: 18, padding: 20, width: '94%', maxWidth: 380, maxHeight: '88%' },
   modalClose: { position: 'absolute', top: 14, right: 16, zIndex: 10 },
   modalCloseText: { color: colors.textSecondary, fontSize: 22 },
   modalTitle: { color: colors.text, fontSize: 22, fontWeight: '700', textAlign: 'center' },
   modalSubtitle: { color: colors.textSecondary, fontSize: 13, textAlign: 'center', marginBottom: 12 },
-
   stripWrapper: { marginVertical: 8 },
   stripLabel: { color: colors.text, fontSize: 13, fontWeight: '600', marginBottom: 6, textAlign: 'center' },
   filmStrip: { backgroundColor: '#0D0D0D', borderRadius: 12, paddingVertical: 6, borderWidth: 7, borderColor: '#222', overflow: 'hidden' },
@@ -443,14 +429,12 @@ const styles = StyleSheet.create({
   posterPlaceholder: { width: '100%', height: 48, backgroundColor: '#1A1A1A', borderRadius: 5, marginBottom: 4 },
   stripCardTitle: { color: colors.text, fontSize: 9.5, fontWeight: '700', textAlign: 'center' },
   stripCardMeta: { color: colors.textSecondary, fontSize: 8, marginTop: 1 },
-
   finalSection: { marginTop: 12, marginBottom: 4 },
   finalLabel: { color: colors.accent, fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 6, textAlign: 'center' },
   finalCard: { flexDirection: 'row', backgroundColor: colors.surface, borderRadius: 12, padding: 10, alignItems: 'center', borderWidth: 2, borderColor: colors.accent },
   finalPoster: { width: 54, height: 68, backgroundColor: '#222', borderRadius: 6, marginRight: 12 },
   finalTitle: { color: colors.text, fontSize: 15, fontWeight: '700' },
   finalMeta: { color: colors.textSecondary, fontSize: 12, marginTop: 2 },
-
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 16 },
   spinAgainBtn: { flex: 1, backgroundColor: 'rgba(255,255,255,0.08)', paddingVertical: 13, borderRadius: 12, alignItems: 'center' },
   spinAgainText: { color: colors.text, fontSize: 15, fontWeight: '600' },
