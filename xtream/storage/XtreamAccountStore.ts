@@ -4,7 +4,13 @@ import { XtreamAccountInfo, XtreamSession } from '@/xtream/types';
 import { AppLogger } from '@/stability/AppLogger';
 
 const ACCOUNT_KEY = 'premium_iptv_xtream_account';
-const passwordKey = (playlistId: string) => `premium_iptv_xtream_password:${playlistId}`;
+
+// Sanitize key to only contain: alphanumeric, ".", "-", "_"
+const sanitizeKey = (input: string): string => {
+  return input.replace(/[^a-zA-Z0-9._-]/g, '_');
+};
+
+const passwordKey = (playlistId: string) => `premium_iptv_xtream_password_${sanitizeKey(playlistId)}`;
 
 export interface StoredXtreamAccount {
   playlistId: string;

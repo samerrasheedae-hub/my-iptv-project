@@ -86,7 +86,6 @@ export class BackendM3UService implements M3UService {
       metadata: { provider: 'm3u', operation: 'categories' },
     });
 
-    // Backend is expected to build this index incrementally. This local fallback is structured mock data only.
     const groups = Array.from({ length: 72 }).map((_, index) => `M3U Group ${index + 1}`);
     const categories = groups.map((groupTitle, index) => ({
       id: categoryIdForGroup(request.playlistId, groupTitle),
@@ -148,19 +147,10 @@ export class BackendM3UService implements M3UService {
 
 /*
  * Task 019f – 12.2 – M3U Service – functional connection layer
- * Added alongside BackendM3UService – does NOT break existing service
- * UI → Service → Repository → Engine ONLY
- * Preserve mock/fallback – no full playlist download – 100k+ optimized
  */
-
-import type { M3UCategory } from '@/m3u/types';
 
 /**
  * listCategories – Task 12 service contract
- * - q?: string – server-side filter
- * - MUST call repository ONLY – never engine directly
- * - Returns { data, fromMock }
- * - Paginated / 100k+ safe – caller controls paging via q filter, underlying repo caps at 500 items per Task 12
  */
 export async function listCategories(
   repository: { listCategories: (req: any) => Promise<any> },
@@ -168,18 +158,16 @@ export async function listCategories(
   q?: string,
   signal?: AbortSignal
 ): Promise<{ data: M3UCategory[]; fromMock: boolean }> {
-  // Import dynamically to avoid circular deps – keeps existing architecture intact
   const { listCategoriesTask12 } = await import('@/m3u/repositories/M3URepository');
   try {
     return await listCategoriesTask12(repository, playlistId, q, signal);
   } catch (e) {
-    // Fallback – preserve mock/fallback mode per project rules
     return { data: [], fromMock: true };
   }
 }
 
 /**
- * ServiceResult wrapper – matches Task 12 spec used by UI hook
+ * ServiceResult wrapper – matches Task 12 spec
  */
 export type CategoryServiceResult<T> = {
   ok: boolean;
@@ -189,8 +177,7 @@ export type CategoryServiceResult<T> = {
 };
 
 /**
- * Convenience wrapper used by hooks/useM3UCategoriesV2
- * Keeps existing BackendM3UService.getCategories(request: M3UCategoryRequest) untouched
+ * Convenience wrapper used by hooks
  */
 export async function listCategoriesSimple(
   playlistId: string,
@@ -201,8 +188,6 @@ export async function listCategoriesSimple(
   }
 ): Promise<CategoryServiceResult<M3UCategory[]>> {
   try {
-    // If a repository instance is supplied (from UnifiedMediaRuntime / M3URuntime), use it – Service → Repository → Engine
-    // Otherwise fallback to mock – preserves mock/fallback mode
     const repo = deps?.repository;
     if (!repo || !playlistId) {
       return { ok: true, data: [], fromMock: true };

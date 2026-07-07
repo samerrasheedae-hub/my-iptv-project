@@ -33,7 +33,7 @@ export class BackendSubscriptionService implements SubscriptionService {
     return this.unwrap(response.data);
   }
 
-  async checkFeatureAccess(request: FeatureAccessRequest): Promise<FeatureAccessDecision> {
+  async checkFeatureAccessBackend(request: FeatureAccessRequest): Promise<FeatureAccessDecision> {
     const response = await this.networkRepository.request<BackendEnvelope<FeatureAccessDecision>>({
       method: 'POST',
       url: '/subscriptions/access/check',
@@ -43,6 +43,10 @@ export class BackendSubscriptionService implements SubscriptionService {
       metadata: { domain: 'subscription', operation: 'feature-access' },
     });
     return this.unwrap(response.data);
+  }
+
+  async checkFeatureAccess(request: FeatureAccessRequest): Promise<FeatureAccessDecision> {
+    return this.checkFeatureAccessBackend(request);
   }
 
   async createUpgradeIntent(input: { userId: string; provider: PaymentProviderKind; targetTier: SubscriptionTier }): Promise<UpgradeIntent> {
@@ -65,38 +69,20 @@ export class BackendSubscriptionService implements SubscriptionService {
 
 /*
  * Task 019f – 4/6 – Store / legal / payment – functional connection wrappers
- * Added 2026-07-07 – keeps existing BackendSubscriptionService intact
- * – Provides simple module-level API expected by UI Settings:
- *   getCurrentPlan(): Promise<'free'|'premium'>
- *   checkFeatureAccess(feature:string): Promise<boolean>
- *   getGracePeriodDays(): number
- *   isExpired(): Promise<boolean>
- * – Mock/fallback preserved – no backend network call unless explicitly configured
- * – Do NOT break existing Xtream Engine, M3U Engine, Unified Media Engine, PlayerController, Repository, Cache, Network
+ * Module-level singleton state – mock fallback by default
  */
 
-import type { FeatureAccessDecision } from './UserService'; // if exists – safe guarded below
-
-// Module-level singleton state – mock fallback by default – matches project mock/fallback mode
 let __mockPlan: 'free' | 'premium' = 'free';
 let __mockExpired = false;
 const __MOCK_GRACE_DAYS = 7;
 
 /**
  * getCurrentPlan – Task 12.4 required export
- * Returns 'free' | 'premium'
- * - Tries real BackendSubscriptionService if a global runtime is wired
- * - Falls back to mock 'free' immediately – preserves mock/fallback mode
- * - No network call unless explicitly provided – keeps 100k+ UI snappy
- * - Signature EXACTLY as requested: Promise<'free'|'premium'>
  */
 export async function getCurrentPlan(): Promise<'free' | 'premium'> {
   try {
-    // If a runtime provider exposes current user – try gracefully, never throw to UI
-    // The real BackendSubscriptionService requires userId – in mock mode we return 'free'
-    // This preserves: “Preserve the current mock/fallback mode when no provider account is connected.”
     if (typeof window !== 'undefined' && (window as any).__IPTV_SUBSCRIPTION_MOCK__) {
-      return (window as any).__IPTMP_SUBSCRIPTION_MOCK__ as 'free' | 'premium';
+      return (window as any).__IPTV_SUBSCRIPTION_MOCK__ as 'free' | 'premium';
     }
     return __mockPlan;
   } catch {
@@ -105,36 +91,27 @@ export async function getCurrentPlan(): Promise<'free' | 'premium'> {
 }
 
 /**
- * checkFeatureAccess – Task 12.4 – string overload (simple)
- * Existing BackendSubscriptionService.checkFeatureAccess expects FeatureAccessRequest object –
- * this wrapper provides the simple string API requested by the UI task, while keeping
- * the original class method intact – backward compatible – does NOT break existing Repository layer
+ * checkFeatureAccess – Task 12.4 – simple string API wrapper
  */
-export async function checkFeatureAccess(feature: string): Promise<boolean>;
-export async function checkFeatureAccess(request: any): Promise<any>;
 export async function checkFeatureAccess(
   arg0: string | { featureId?: string; feature?: string; [k: string]: any }
 ): Promise<boolean> {
   try {
-    // Mock fallback – always allow in mock mode – per “Preserve mock/fallback mode”
-    // Real implementation would delegate to BackendSubscriptionService with proper userId
-    // – but that would require breaking change to repository auth flow – we keep mock safe
     return true;
   } catch {
-    return true; // fail-open in mock – preserves UX – do not block UI
+    return true;
   }
 }
 
 /**
- * getGracePeriodDays – synchronous – Task spec requires number return
+ * getGracePeriodDays – synchronous
  */
 export function getGracePeriodDays(): number {
   return __MOCK_GRACE_DAYS;
 }
 
 /**
- * isExpired – Task spec: Promise<boolean>
- * Mock fallback: always false (not expired) – keeps app usable offline
+ * isExpired – Promise<boolean>
  */
 export async function isExpired(): Promise<boolean> {
   try {
@@ -144,11 +121,6 @@ export async function isExpired(): Promise<boolean> {
   }
 }
 
-/**
- * Optional helpers – not required by Task, but useful to keep UI in sync
- * – exported to avoid “is not exported” TS errors if UI tries them
- * – all no-ops in mock mode – do NOT break existing PaymentProvider
- */
 export async function setMockPlan(plan: 'free' | 'premium') {
   __mockPlan = plan;
   return plan;
@@ -160,8 +132,3 @@ export const __task12_store_api__ = {
   getGracePeriodDays,
   isExpired,
 } as const;
-
-// Ensure module can be imported as:
-// import * as SubscriptionService from '@/monetization/services/SubscriptionService'
-// SubscriptionService.getCurrentPlan?.().then(...)
-// – per Task 4 spec – all functions are named exports above – ✅

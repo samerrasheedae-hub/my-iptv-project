@@ -3,7 +3,7 @@ import { ProgressiveImage } from '@/components/images/ProgressiveImage';
 import { colors, radius, shadows, spacing, typography } from '@/design/tokens';
 import { ContentItem, ContentRowModel } from '@/types/content';
 import { Ionicons } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
 interface PosterCardProps {
@@ -12,34 +12,49 @@ interface PosterCardProps {
 }
 
 export function PosterCard({ item, variant = 'poster' }: PosterCardProps) {
+  const router = useRouter();
   const isLandscape = variant === 'landscape' || variant === 'continueWatching';
   const imageSource = isLandscape ? item.backdropUrl : item.posterUrl;
 
+  const handlePress = () => {
+    router.push({
+      pathname: '/player/[id]',
+      params: { id: item.id, ...(item.playerRouteContext || {}) },
+    });
+  };
+
   return (
-    <Link href={{ pathname: '/player/[id]', params: { id: item.id, ...item.playerRouteContext } }} asChild>
-      <AnimatedPressable style={[styles.card, isLandscape ? styles.landscape : styles.poster]}>
-        <ProgressiveImage uri={imageSource} thumbnailUri={item.backdropUrl} style={StyleSheet.absoluteFillObject} recyclingKey={item.id} accessibilityLabel={item.title} />
-        <View style={styles.scrim} />
-        {item.kind === 'live' ? (
-          <View style={styles.liveBadge}>
-            <View style={styles.liveDot} />
-            <Text style={styles.liveText}>LIVE</Text>
-          </View>
-        ) : null}
-        {variant === 'continueWatching' && typeof item.progress === 'number' ? (
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${Math.min(item.progress * 100, 100)}%` }]} />
-          </View>
-        ) : null}
-        <View style={styles.meta}>
-          <Text numberOfLines={1} style={styles.title}>{item.title}</Text>
-          <View style={styles.metaLine}>
-            <Ionicons name={isLandscape ? 'play-circle' : 'star'} size={12} color={colors.primary} />
-            <Text numberOfLines={1} style={styles.subtle}>{item.year ?? item.kind}</Text>
-          </View>
+    <AnimatedPressable
+      onPress={handlePress}
+      style={[styles.card, isLandscape ? styles.landscape : styles.poster]}
+    >
+      <ProgressiveImage
+        uri={imageSource}
+        thumbnailUri={item.backdropUrl}
+        style={StyleSheet.absoluteFillObject}
+        recyclingKey={item.id}
+        accessibilityLabel={item.title}
+      />
+      <View style={styles.scrim} />
+      {item.kind === 'live' ? (
+        <View style={styles.liveBadge}>
+          <View style={styles.liveDot} />
+          <Text style={styles.liveText}>LIVE</Text>
         </View>
-      </AnimatedPressable>
-    </Link>
+      ) : null}
+      {variant === 'continueWatching' && typeof item.progress === 'number' ? (
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${Math.min(item.progress * 100, 100)}%` }]} />
+        </View>
+      ) : null}
+      <View style={styles.meta}>
+        <Text numberOfLines={1} style={styles.title}>{item.title}</Text>
+        <View style={styles.metaLine}>
+          <Ionicons name={isLandscape ? 'play-circle' : 'star'} size={12} color={colors.primary} />
+          <Text numberOfLines={1} style={styles.subtle}>{item.year ?? item.kind}</Text>
+        </View>
+      </View>
+    </AnimatedPressable>
   );
 }
 
