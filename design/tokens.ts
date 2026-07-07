@@ -1,19 +1,62 @@
 import { Platform } from 'react-native';
 
 export const colors = {
-  background: '#050509',
-  backgroundElevated: '#0D0D14',
-  surface: '#14141F',
-  surfaceSoft: '#1C1C29',
-  surfaceGlass: 'rgba(17, 17, 26, 0.72)',
+  // === Core Dark Theme ===
+  background: '#0A0A0A',
+  backgroundElevated: '#121212',
+  surface: '#141414',
+  surfaceSoft: '#1F1F1F',
+  surfaceGlass: 'rgba(20, 20, 20, 0.85)',
+  surfaceLight: '#1F1F1F',
+
   text: '#FFFFFF',
-  textMuted: '#A6A6B3',
-  textSubtle: '#6F7080',
-  primary: '#E50914',
-  primaryDark: '#B20710',
-  border: 'rgba(255,255,255,0.08)',
-  success: '#26D07C',
+  textMuted: '#A0A0A0',
+  textSecondary: '#A0A0A0',
+  textSubtle: '#666666',
+
+  // Buttons (مطابق للصور المرجعية)
+  primary: '#FFFFFF',
+  primaryDark: '#000000',
+  buttonPrimary: '#FFFFFF',
+  buttonPrimaryText: '#000000',
+  buttonSecondary: 'rgba(255,255,255,0.12)',
+  buttonSecondaryText: '#FFFFFF',
+
+  // Accent
+  accent: '#FF4D00',
+  accentLight: '#FF6B35',
+
+  border: '#333333',
+  borderLight: '#222222',
+
+  success: '#34C759',
   warning: '#FFB547',
+  error: '#FF3B30',
+
+  // Tab Bar
+  tabBarBackground: '#0F0F0F',
+  tabActive: '#FFFFFF',
+  tabInactive: '#888888',
+
+  // Special
+  heroOverlay: 'rgba(0,0,0,0.65)',
+  cardOverlay: 'rgba(0,0,0,0.55)',
+
+  // Mood
+  moodBg: '#1F1F1F',
+  moodActiveBg: '#FF4D00',
+
+  // Dropdown
+  dropdownBg: '#1F1F1F',
+  dropdownBorder: '#333333',
+};
+
+export const radius = {
+  sm: 8,
+  md: 14,
+  lg: 22,
+  xl: 30,
+  full: 999,
 };
 
 export const spacing = {
@@ -24,14 +67,6 @@ export const spacing = {
   xl: 24,
   '2xl': 32,
   '3xl': 44,
-};
-
-export const radius = {
-  sm: 8,
-  md: 14,
-  lg: 22,
-  xl: 30,
-  full: 999,
 };
 
 export const typography = {
