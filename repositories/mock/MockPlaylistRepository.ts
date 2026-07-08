@@ -26,4 +26,12 @@ export class MockPlaylistRepository implements PlaylistRepository {
     await wait(80);
     if (mockPlaylists.some((playlist) => playlist.id === id)) this.activePlaylistId = id;
   }
+
+  async addPlaylist(_playlist: Playlist): Promise<void> {
+    await wait(50);
+  }
+
+  async removePlaylist(_id: string): Promise<void> {
+    await wait(50);
+  }
 }
