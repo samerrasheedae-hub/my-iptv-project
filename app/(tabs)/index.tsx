@@ -28,10 +28,20 @@ export default function HomeScreen() {
     }
   }, [showSurprise, surprisePool]);
 
-  if (isLoading || !data) {
+  if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
         <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (!data) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.emptyIcon}>📡</Text>
+        <Text style={styles.emptyTitle}>No source connected</Text>
+        <Text style={styles.emptySubtitle}>Go to Settings → Add Playlist to connect your IPTV account</Text>
       </View>
     );
   }
@@ -380,8 +390,11 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   scrollContent: { paddingBottom: 20 },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background, padding: 32 },
   loadingText: { color: colors.text, fontSize: 16 },
+  emptyIcon: { fontSize: 52, marginBottom: 16 },
+  emptyTitle: { color: colors.text, fontSize: 20, fontWeight: '700', marginBottom: 10, textAlign: 'center' },
+  emptySubtitle: { color: colors.textSubtle, fontSize: 14, textAlign: 'center', lineHeight: 22 },
   section: { marginBottom: 24, paddingHorizontal: 20 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   sectionTitle: { color: colors.text, fontSize: 18, fontWeight: '700' },
