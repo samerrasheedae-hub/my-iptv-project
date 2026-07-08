@@ -1,4 +1,4 @@
-import { createMockRepositoryContainer } from '@/repositories/mock/createMockRepositoryContainer';
+import { createProductionRepositoryContainer } from '@/repositories/production/createProductionRepositoryContainer';
 import { RepositoryContainer } from '@/repositories/RepositoryContainer';
 import { PropsWithChildren, createContext, useContext, useRef, useState } from 'react';
 
@@ -16,7 +16,7 @@ export function RepositoryProvider({ children }: PropsWithChildren) {
   const repositoriesRef = useRef<RepositoryContainer | null>(null);
 
   if (!repositoriesRef.current) {
-    repositoriesRef.current = createMockRepositoryContainer(notifyChanged);
+    repositoriesRef.current = createProductionRepositoryContainer(notifyChanged);
   }
 
   return (
