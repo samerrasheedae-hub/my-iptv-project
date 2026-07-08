@@ -61,6 +61,8 @@ export function useNetflixHome() {
     const home = await repositories.mediaCatalogRepository.getHomeCatalog(playlistId);
     const heroSummary = home.hero ?? (await repositories.mediaCatalogRepository.listMedia({ playlistId, limit: 1 })).items[0];
 
+    if (!heroSummary) return null;
+
     const rowConfigs: Array<Omit<NetflixHomeRowModel, 'items' | 'nextCursor'> & { query?: MediaListQuery }> = [
       { id: 'recently-added', title: 'Recently Added', variant: 'poster', query: { playlistId, limit: PAGE_SIZE, sort: 'recently_added' } },
       { id: 'trending', title: 'Trending Now', variant: 'poster', query: { playlistId, limit: PAGE_SIZE, sort: 'rating' } },
