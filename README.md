@@ -38,7 +38,7 @@ Expo/EAS production build readiness has been configured:
 - Empty Android dangerous permissions list
 - Production console logging disabled through app loggers
 
-See `docs-production-build-release.md`.
+See `docs/production-build-release.md`.
 
 ## Monetization and user management
 
@@ -53,7 +53,7 @@ A production-ready monetization/user management module has been added without ch
 - Backend-driven feature access checks
 - Payment provider abstraction for Stripe, Apple IAP, and Google Play
 
-See `docs-monetization-user-management.md`.
+See `docs/monetization-user-management.md`.
 
 ## Production readiness
 
@@ -68,7 +68,7 @@ A stability-focused production readiness pass was added without changing archite
 - Skeleton fallback for player loading/buffering
 - Basic performance logging hooks
 
-See `docs-production-readiness.md`.
+See `docs/production-readiness.md`.
 
 ## Performance optimization pass
 
@@ -82,7 +82,7 @@ A production performance pass was added without changing UI design or architectu
 - Image failure cooldown and prefetch de-duplication
 - Existing category-on-demand memory strategy preserved
 
-See `docs-performance-optimization.md`.
+See `docs/performance-optimization.md`.
 
 ## Unified Media Engine
 
@@ -96,11 +96,11 @@ A provider-neutral Unified Media Engine has been added above Xtream and M3U:
 - Unified search
 - Unified home feed
 
-No UI files were changed and existing Xtream/M3U engines remain intact. See `docs-unified-media-engine.md`.
+No UI files were changed and existing Xtream/M3U engines remain intact. See `docs/unified-media-engine.md`.
 
 ## Real Xtream networking
 
-The Xtream Engine now uses real Xtream Codes `player_api.php` communication inside the existing architecture. It authenticates, loads account info, loads categories, and loads streams only when a category is opened. It never downloads the full playlist and never uses full M3U playlist loading. See `docs-xtream-real-networking.md`.
+The Xtream Engine now uses real Xtream Codes `player_api.php` communication inside the existing architecture. It authenticates, loads account info, loads categories, and loads streams only when a category is opened. It never downloads the full playlist and never uses full M3U playlist loading. See `docs/xtream-real-networking.md`.
 
 ## Networking layer
 
@@ -115,7 +115,7 @@ A production-ready provider-neutral networking layer has been added:
 - Request/response interceptors
 - Retry, timeout, cancellation, auth, logging, offline queueing, recovery drain, and rate limiting
 
-No Xtream or M3U networking is connected. See `docs-networking-layer.md`.
+No Xtream or M3U networking is connected. See `docs/networking-layer.md`.
 
 ## Premium player
 
@@ -130,7 +130,7 @@ The player route now uses a provider-neutral production player architecture:
 - Live/movie/series modes
 - Track selectors, seek bar, gestures, screen lock, casting/PiP architecture, and auto-hide controls
 
-No Xtream or M3U playback integration is connected. See `docs-player-architecture.md`.
+No Xtream or M3U playback integration is connected. See `docs/player-architecture.md`.
 
 ## Netflix home screen
 
@@ -147,7 +147,7 @@ The home screen is now repository-driven and includes:
 - Skeleton loading
 - Reusable `NetflixHomeRow` component
 
-No Xtream or M3U networking is connected. See `docs-netflix-home.md`.
+No Xtream or M3U networking is connected. See `docs/netflix-home.md`.
 
 ## Image loading system
 
@@ -162,7 +162,7 @@ The app includes a reusable poster/backdrop image system built on `expo-image`:
 - Blur while loading
 - Optimized FlatList settings for thousands of posters
 
-See `docs-image-loading.md` for details.
+See `docs/image-loading.md` for details.
 
 ## Cache system
 
