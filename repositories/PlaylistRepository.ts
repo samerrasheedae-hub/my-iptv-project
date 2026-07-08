@@ -6,4 +6,6 @@ export interface PlaylistRepository {
   getPlaylist(id: string): Promise<Playlist | undefined>;
   getActivePlaylist(): Promise<Playlist | undefined>;
   setActivePlaylist(id: string): Promise<void>;
+  addPlaylist(playlist: Playlist): Promise<void>;
+  removePlaylist(id: string): Promise<void>;
 }
