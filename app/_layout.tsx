@@ -3,6 +3,7 @@ import { RepositoryProvider } from '@/providers/RepositoryProvider';
 import { XtreamRuntimeProvider } from '@/providers/XtreamRuntimeProvider';
 import { UnifiedMediaRuntimeProvider } from '@/providers/UnifiedMediaRuntimeProvider';
 import { M3URuntimeProvider } from '@/providers/M3URuntimeProvider';
+import { XtreamPlaylistSyncGate } from '@/providers/XtreamPlaylistSyncGate';
 import { ErrorBoundary } from '@/stability/ErrorBoundary';
 import { installGlobalErrorHandler } from '@/stability/globalErrorHandler';
 import { Stack } from 'expo-router';
@@ -16,19 +17,21 @@ export default function RootLayout() {
       <RepositoryProvider>
         <XtreamRuntimeProvider>
           <M3URuntimeProvider>
-          <UnifiedMediaRuntimeProvider>
-        <StatusBar style="light" />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: colors.background },
-            animation: 'fade_from_bottom',
-          }}
-        >
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="player/[id]" options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }} />
-        </Stack>
-          </UnifiedMediaRuntimeProvider>
+            <UnifiedMediaRuntimeProvider>
+              <XtreamPlaylistSyncGate>
+                <StatusBar style="light" />
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    contentStyle: { backgroundColor: colors.background },
+                    animation: 'fade_from_bottom',
+                  }}
+                >
+                  <Stack.Screen name="(tabs)" />
+                  <Stack.Screen name="player/[id]" options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }} />
+                </Stack>
+              </XtreamPlaylistSyncGate>
+            </UnifiedMediaRuntimeProvider>
           </M3URuntimeProvider>
         </XtreamRuntimeProvider>
       </RepositoryProvider>
